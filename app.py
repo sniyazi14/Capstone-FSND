@@ -1,5 +1,10 @@
 import os
-from flask import Flask, request, abort, jsonify
+import sys
+from flask import (
+                   Flask,
+                   request,
+                   abort,
+                   jsonify)
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -25,6 +30,11 @@ def create_app(test_config=None):
         response.headers.add('Access-Control-Allow-Methods',
                              'GET,PATCH,POST,DELETE,OPTIONS')
         return response
+
+    # Root route
+    @app.route('/')
+    def index():
+        return jsonify({'message': 'Welcome to Career Advising Capstone API'})
 
     # Fetch users information, needs permission
     @app.route('/users')
@@ -59,18 +69,20 @@ def create_app(test_config=None):
     def add_advisor(jwt):
         try:
             body = request.get_json()
-            first_name = body.get('first_name', None)
-            last_name = body.get('last_name', None)
-            field = body.get('field', None)
-            position = body.get('position', None)
-            experience = body.get('experience', None)
-            country = body.get('country', None)
+            first_name = body.get('first_name')
+            last_name = body.get('last_name')
+            field = body.get('field')
+            position = body.get('position')
+            experience = body.get('experience')
+            country = body.get('country')
+            print(sys.exc_info())
             if first_name is None or field is None:
                 abort(400)
             advisor = Advisor(first_name=first_name, last_name=last_name,
                               field=field, position=position,
                               experience=experience, country=country)
             advisor.insert()
+            print(sys.exc_info())
             result = {
                 "success": True,
                 "advisor": advisor.fetch()
@@ -81,26 +93,21 @@ def create_app(test_config=None):
 
     # Add a new user to the database
     @app.route('/users', methods=['POST'])
-    #@requires_auth('post:users')
-    def add_new_user():
+    @requires_auth('post:users')
+    def add_new_user(jwt):
         try:
             body = request.get_json()
-            first_name = body.get('first_name', '')
-            last_name = body.get('last_name', '')
-            field = body.get('field', '')
-            advisor_name = body.get('advisor_name', '')
-            level = body.get('level', '')
-            subscription_active = body.get('subscription_active', '')
-            #if first_name is None or field is None:
-                #abort(400)
-            print('here 1')
+            first_name = body.get('first_name')
+            last_name = body.get('last_name')
+            field = body.get('field')
+            advisor_name = body.get('advisor_name')
+            level = body.get('level')
+            subscription_active = body.get('subscription_active')
             user = User(first_name=first_name, last_name=last_name,
                         field=field, level=level,
                         advisor_name=advisor_name,
                         subscription_active=subscription_active)
-            print('here 2')
             user.insert()
-            print('here 3')
             result = {
                 "success": True,
                 "user": user.fetch()
@@ -116,10 +123,7 @@ def create_app(test_config=None):
         try:
             user = User.query.filter(User.id == u_id).one_or_none()
             if user is None:
-                return json.dumps({
-                    'success': False,
-                    'error': 'User ' + id + ' not found'
-                }), 404
+                abort(404)
             body = request.get_json()
             subscription_active = body.get('subscription_active', True)
             user.subscription_active = subscription_active

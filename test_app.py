@@ -1,16 +1,16 @@
+from app import create_app
 import os
 import unittest
 import json
 from flask_sqlalchemy import SQLAlchemy
-
-from flaskr import create_app
-from models import setup_db, Question, Category
+from models import setup_db, Advisor, User
 
 
 manager_jwt = os.environ['MANAGER']
 employee_jwt = os.environ['ASSISTANT']
 manager_header = {'Authorization': 'Bearer' + str(manager_jwt)}
 employee_header = {'Authorization': 'Bearer' + str(employee_jwt)}
+
 
 class CapstoneTestCase(unittest.TestCase):
     def setUp(self):
@@ -34,7 +34,7 @@ class CapstoneTestCase(unittest.TestCase):
             'first_name': 'first_name',
             'last_name': 'last_name',
             'field': 'field',
-            'level': 'level',
+            'level': 1,
             'subscription_active': True,
             'advisor_name': 'advisor_name'
         }
@@ -45,7 +45,7 @@ class CapstoneTestCase(unittest.TestCase):
             self.db.init_app(self.app)
             # create all tables
             self.db.create_all()
-    
+
     def tearDown(self):
         """Executed after reach test"""
         pass
@@ -56,7 +56,6 @@ class CapstoneTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        #self.assertTrue(len(data['users']))
         self.assertTrue(data['users'])
 
     def test_get_advisors(self):
@@ -65,10 +64,11 @@ class CapstoneTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(len(data['advisors']))
+        self.assertTrue(data['advisors'])
 
     def test_add_user(self):
-        res = self.client().post('/users', json=self.question, headers=manager_header)
+        res = self.client().post('/users', json=self.user,
+                                 headers=manager_header)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -78,10 +78,11 @@ class CapstoneTestCase(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'Unprocessable entity')
+        self.assertEqual(data['message'], 'unprocessable')
 
     def test_update_user(self):
-        res = self.client().patch('/users/1', json=self.question, headers=manager_header)
+        res = self.client().patch('/users/1', json=self.user,
+                                  headers=manager_header)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -91,10 +92,10 @@ class CapstoneTestCase(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'User 1000 not found')
 
     def test_add_advisor(self):
-        res = self.client().post('/users', json=self.question, headers=manager_header)
+        res = self.client().post('/users', json=self.advisor,
+                                 headers=manager_header)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -104,7 +105,7 @@ class CapstoneTestCase(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'Unprocessable entity')
+        self.assertEqual(data['message'], 'unprocessable')
 
     def test_delete_user(self):
         res = self.client().delete('/user/1', headers=manager_header)
@@ -119,41 +120,40 @@ class CapstoneTestCase(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'Unprocessable entity')
+        self.assertEqual(data['message'], 'unprocessable')
 
     def test_delete_advisor(self):
         res = self.client().delete('/advisors/1')
         data = json.loads(res.data)
-        user = User.query.filter(User.id == 1).one_or_none()
+        advisor = Advisor.query.filter(Advisor.id == 1).one_or_none()
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(user, None)
+        self.assertEqual(advisor, None)
 
     def test_delete_nonexistent_advisor(self):
         res = self.client().delete('/advisors/1000')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'Unprocessable entity')
+        self.assertEqual(data['message'], 'unprocessable')
 
     def test_forbidden_employee(self):
         res = self.client().delete('/advisors/1000')
         data = json.loads(res.data)
-        self.assertEqual(res.status_code, 422)
+        self.assertEqual(res.status_code, 401)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Unprocessable entity')
 
     def test_auth_allowed_employee(self):
         res = self.client().get('/users', headers=employee_header)
         data = json.loads(res.data)
-        self.assertEqual(res.status_code, 422)
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'Unprocessable entity')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
 
     def test_unauthorized(self):
         res = self.client().delete('/advisors/1000')
         data = json.loads(res.data)
-        self.assertEqual(res.status_code, 422)
+        self.assertEqual(res.status_code, 401)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Unprocessable entity')
 

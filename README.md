@@ -1,8 +1,5 @@
 # Full Stack Nanodegree Capstone Project
 # Career Advising Company
-https://unit4.us.auth0.com/authorize?audience=capstone&response_type=token&client_id=tAeXeJlyCZcxJpLI0MpMm7FXGMR9QLwf&redirect_uri=http://localhost:8100/login-results
-
-curl http://127.0.0.1:5000/users -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlVEdlNCdkRzMzZ4ZFcwdFZTYW90cyJ9.eyJpc3MiOiJodHRwczovL3VuaXQ0LnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJnb29nbGUtb2F1dGgyfDEwOTQ1ODcxNzgzOTE5Njk1OTAwOCIsImF1ZCI6WyJjYXBzdG9uZSIsImh0dHBzOi8vdW5pdDQudXMuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTU5ODk3NjM3NywiZXhwIjoxNTk5MDYyNzc3LCJhenAiOiJ0QWVYZUpseUNaY3hKcExJME1wTW03RlhHTVI5UUx3ZiIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6YWR2aXNvcnMiLCJkZWxldGU6dXNlcnMiLCJnZXQ6dXNlcnMiLCJwYXRjaDphZHZpc29ycyIsInBhdGNoOnVzZXJzIiwicG9zdDphZHZpc29ycyIsInBvc3Q6dXNlcnMiXX0.mBcRWqbSbzl-JQ2u17otgf0Dy8JCx4wKohU7wlu1T-o2wEWd9eizzmZmGvHElKGl1grc1olAmFk9bWOqTwFEsRTr1podB6Al88m3edtGAjMlwphoHccNQmPXHt6YlLP45pOUPEM2xeMVk7NuHMQslQj72n9IJwXb-Oi7ZSgnifyuNHrTgcPt_A1L0Hjh3u9o-RvKrKR32uYCDu7UoQwo0twi3MbhejooCZRb0r24Xzr5HyHZ3dpXROsy74zH_s2uGIeqSUT7f0NauXuWF3eGsvqr9yFMcg3Uh0uzcPFX_eHoWfexg2Nh6uN6chRzKvpD1q4ClhvPpJcDzQPcLWOyBg&scope=openid%20profile%20email&expires_in=86400&token_type=Bearer&state=g6Fo2SA1T1FZMDNEXzhKOWV6YWN1SUVOank0dWZFU0REdzhYaaN0aWTZIEdwdmZRLUxTRmdWMUhjV002ZGdFdUFxT2Q4MkQycG94o2NpZNkgdEFlWGVKbHlDWmN4SnBMSTBNcE1tN0ZYR01SOVFMd2Y" -H "Content-Type: application/json"
 
 ## Motivation
 This project was created to model a company that provides career advising services online through matching users(customers) to one of the many advisors from around the world registered with the company that match their field and career aspirations. The services are provided to users that pay for monthly subscription to the services.
@@ -20,28 +17,56 @@ Install using instructions in [python docs](https://docs.python.org/3/using/unix
 Run the following command in the terminal to install all the pip packages required 
 
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
+
+## Data Modelling:
+MODELS.PY
+The schema for the database and helper methods to simplify API behavior are in models.py:
+
+There are two tables created: Advisor and User.
+The Advisor table has all the advisors that are available to match with users based on the field. It stores their name, field, position, years of exeperience and country.
+The User table keeps track of the users of the service who receive career advising from the advisors by storing their name, field, level, advisor name and subscription status.
+Each table has an insert, update, delete, and format helper functions.
 
 ## Create a database
 You need to create a postgreSQL database to store the data. Use the following command in the terminal to create a database
 ```bash
 CREATEDB {database_name}
 ```
-
+## Virtual Environment
+It is recommended to run this application using a virtual environment. To run a virtual environment run the following commands in the terminal while in your project folder
+Linux
+  ```bash
+virtualenv --python 'path-to-python' venv
+source venv/bin/activate
+  ```
+Windows
+  ```bash
+virtualenv --python 'path-to-python' venv
+.\venv\Scripts\activate
+  ```
 ## Running the server
 
 To run the server using the environmental variables in setup.sh file, use the following commands in the terminal:
 
+On Linux : export
 ```bash
 source setup.sh
 export FLASK_APP=app
 flask run --reload
 ```
 
+On Windows : set
+set FLASK_APP=app.py;
+```bash
+source setup.sh
+set FLASK_APP=app
+flask run --reload
+```
 
 ## Endpoints
-
+###GET '/'
 ###GET '/users'
 ###GET '/advisors'
 ###DELETE '/users/<int>'
@@ -51,76 +76,157 @@ flask run --reload
 ###PATCH '/users'
 ###PATCH '/advisors'
 
+###GET '/'
+- Root route 
+- Request Arguments: None
+- Returns: An json object with message
+-Example request: curl http://127.0.0.1:5000/
+-Example response:
+{
+    "message": "Welcome to Career Advising Capstone API"
+}
 
 ###GET '/users'
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
+- Fetches a dictionary of users 
 - Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs.
+- Returns: Json object that contains {'succes': True, 'user': {}} and lists all users in the database
 -Example request:
-
+curl -H "Authorization: Bearer <MANAGER_TOKEN>" http://127.0.0.1:5000/users
 -Example response:
-
+{
+    "success": true,
+    "users": [
+        {
+            "advisor_name": "Doe",
+            "field": "Marketing & PR",
+            "first_name": "janes",
+            "id": 2,
+            "last_name": "does",
+            "level": 2,
+            "subscription_active": false
+        },
+        {
+            "advisor_name": "Deema",
+            "field": "Internet of Things",
+            "first_name": "Laila",
+            "id": 4,
+            "last_name": "Doen",
+            "level": 1,
+            "subscription_active": true
+        }
+    ]
+}
 
 ###GET '/advisors'
 - Fetches a dictionary of all questions in the database which contains each question, answer, id, category and difficulty which is paginated with 10 questions per page
 - Also returns the categories similar to GET '/categories' endpoint
 - Request Arguments: None
-- Returns: An object with 5 keys, categories, that contains a object of id: category_string key:value pairs.
--curl http://127.0.0.1:5000/advisors
-
-###DELETE '/users/<int>'
-###DELETE '/advisors/<int>'
-###POST '/users'
-curl -X POST -H "Content-Type: application/json" -d '{"first_name":"Laila", "last_name":"Doen", "field":"Internet of Things", "level":"1", "subscription_active":"True", "advisor_name":"Deema"}' http://127.0.0.1:5000/users
-###POST '/advisors'
-###PATCH '/users'
-###PATCH '/advisors'
-
-DELETE '/questions/<int>'
-- Deletes a specific question from the database
-- Request Arguments: id of question to be deleted (integer)
-- Returns: all questions in similar format to GET '/questions'
-- Example Request:
-curl -X DELETE http://127.0.0.1:5000/questions/31
-- Example response:
-
-
-POST '/questions/add'
-- Creates new question in the database
-- Request Arguments: new question parameters as json object: question(string), answer(string), difficulty(integer), category(string)
-- Returns: success: result key value pair
--Example request:
-curl -X POST -H "Content-Type: application/json" -d '{"question":"new question", "answer":"this", "difficulty":"1", "category":"1"}' http://127.0.0.1:5000/questions/add
-- Example response:
+- Returns: Json object that contains {'succes': True, 'advisors': {}} and lists all advisors in the database
+Example request:
+-curl  http://127.0.0.1:5000/advisors
+Example response:
 {
-  "success": true
+    "advisors": [
+        {
+            "country": "Saudi Arabia",
+            "experience": 8,
+            "field": "Electrical Engineering",
+            "first_name": "Lana",
+            "id": 3,
+            "last_name": "Dodd",
+            "position": "Director of Maintenance"
+        },
+        {
+            "country": "Saudi Arabia",
+            "experience": 15,
+            "field": "Marketing & PR",
+            "first_name": "jane",
+            "id": 4,
+            "last_name": "doe",
+            "position": "Marketing Director"
+        }
+    ],
+    "success": true
 }
 
-POST '/questions/search'
--Performs case-insensitive search on questions table in database to find questions that contain given search term
-- Request Arguments: search term (string)
-- Returns: Response similar to '/questions' with only questions that contain specified search term as substring of the question
-- Example request:
-curl -X POST -H "Content-Type: application/json" -d '{"searchTerm":"title"}' http://127.0.0.1:5000/questions/search
-- Example response:
-  
-
-POST '/quizzes'
-- Fetches a question a new question that is in selected category and not one of previous questions
-- Request Arguments: previous questions array and quiz category dictionary with type and id
-- Return: single question JSON object
-- Example request:
-curl -d '{"previous_questions": [16],"quiz_category": {"type":"Art","id": "2"}}' -H 'Content-Type: application/json' -X POST http://127.0.0.1:5000/quizzes
-- Example response:
+###DELETE '/users/<int>'
+-Deletes a user by id from the database
+Request Arguments: id of user to be deleted
+Returns: Json object that contains {'succes': True, 'deleted': first + last name }
+Example request:curl -X DELETE -H "Authorization: Bearer <MANAGER_TOKEN>" http://127.0.0.1:5000/users/3
+Example response:
 {
-  "question": {
-    "answer": "One",
-    "category": 2,
-    "difficulty": 4,
-    "id": 18,
-    "question": "How many paintings did Van Gogh sell in his lifetime?"
-  },
-  "success": true
+    "delete":"Laila Doen",
+    "success":true
+}
+
+###DELETE '/advisors/<int>'
+-Deletes a user by id from the database
+Request Arguments: id of user to be deleted
+Returns: Json object that contains {'succes': True, 'deleted': first + last name }
+Example request: curl -X DELETE -H "Authorization: Bearer <MANAGER_TOKEN>" http://127.0.0.1:5000/advisors/2
+Example response:
+{
+    "delete":"jane doe",
+    "success":true
+}
+
+###POST '/users'
+-Adds a user to the database
+Request Arguments: json object that contains the following values (first_name, last_name, field, level, subscription_active, advisor_name)
+Returns: Json object that contains {'succes': True, 'user': {}}
+Example request: curl -X POST -H "Content-Type: application/json" -d '{"first_name":"Laila", "last_name":"Doen", "field":"Internet of Things", "level":1, "subscription_active":true, "advisor_name":"Deema"}' -H "Authorization: Bearer <MANAGER_TOKEN>" http://127.0.0.1:5000/users
+Example response:
+{
+    "success":true,
+    "user":{
+        "advisor_name":"Deema",
+        "field":"Internet of Things",
+        "first_name":"Laila",
+        "id":3,
+        "last_name":"Doen",
+        "level":1,
+        "subscription_active":true
+        }
+}
+
+
+###POST '/advisors'
+-Adds an advisor to the database
+Request Arguments: json object that contains the following values (first_name, last_name, field, postion, experience, country)
+Returns: Json object that contains {'succes': True, 'advisor': {}}
+Example request: curl -X POST -H "Content-Type: application/json" -d '{"first_name":"Lana", "last_name":"Dodd", "field":"Electrical Engineering", "position":"Director of Maintenance", "experience":8, "country":"Saudi Arabia"}' -H "Authorization: Bearer <MANAGER_TOKEN>" http://127.0.0.1:5000/advisors
+Example response:
+{
+    "advisor":
+    {
+        "country":"Saudi Arabia",
+        "experience":8,
+        "field":"Electrical Engineering",
+        "first_name":"Lana",
+        "id":3,
+        "last_name":"Dodd",
+        "position":"Director of Maintenance"},
+    "success":true
+}
+
+###PATCH '/users'
+-Update a specific users subscription by id
+Request Arguments: json object contains the boolean value for subscription_active
+Returns: Json object that contains {'succes': True, 'user': {}}
+Example request: curl -X PATCH http://127.0.0.1:8080/actors/2 -H "Authorization: Bearer <MANAGER_TOKEN>" -d '{"subscription_active":"True"}'
+Example response:
+{
+    "success":true,
+    "user":{
+        "advisor_name":"Doe",
+        "field":"Marketing & PR",
+        "first_name":"janes",
+        "id":2,
+        "last_name":"does",
+        "level":2,
+        "subscription_active":false
+        }
 }
 
 
@@ -139,14 +245,25 @@ Format example in JSON:
     "message": "Unprocessable entity"
     }
 
+## Testing
+For testing, a new database can be created called capstone_test. Then the file test_app.py which has all the tests should be run using the command:
+```bash
+python3 test_app.py
+```
+
 ## Authentication
 Roles:
 -Employee: Can view, modify, add and delete users only
 -Manager: Can do everything an employee can as well as add and delete an advisor
 No authentication is need for viewing advisors (non-confidential information)
+Permissions are stored in the JWTs. The permissions are the following:
+-delete:advisors		
+-delete:users		
+-get:users			
+-patch:users		
+-post:advisors		
+-post:users
 
-## Testing
-For testing, a new database can be created called capstone_test. Then the file test_app.py which has all the tests should be run using the command:
-```bash
-python test_app.py
-```
+## Heroku Deployment
+Application has been deployed on the following heroku url:
+https://capstone-sbn.herokuapp.com/
