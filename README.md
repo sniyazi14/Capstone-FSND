@@ -66,17 +66,17 @@ flask run --reload
 ```
 
 ## Endpoints
-###GET '/'
-###GET '/users'
-###GET '/advisors'
-###DELETE '/users/<int>'
-###DELETE '/advisors/<int>'
-###POST '/users'
-###POST '/advisors'
-###PATCH '/users'
-###PATCH '/advisors'
+### GET '/'
+### GET '/users'
+### GET '/advisors'
+### DELETE '/users/<int>'
+### DELETE '/advisors/<int>'
+### POST '/users'
+### POST '/advisors'
+### PATCH '/users'
+### PATCH '/advisors'
 
-###GET '/'
+### GET '/'
 - Root route 
 - Request Arguments: None
 - Returns: An json object with message
@@ -86,7 +86,7 @@ flask run --reload
     "message": "Welcome to Career Advising Capstone API"
 }
 
-###GET '/users'
+### GET '/users'
 - Fetches a dictionary of users 
 - Request Arguments: None
 - Returns: Json object that contains {'succes': True, 'user': {}} and lists all users in the database
@@ -117,7 +117,7 @@ curl -H "Authorization: Bearer <MANAGER_TOKEN>" http://127.0.0.1:5000/users
     ]
 }
 
-###GET '/advisors'
+### GET '/advisors'
 - Fetches a dictionary of all questions in the database which contains each question, answer, id, category and difficulty which is paginated with 10 questions per page
 - Also returns the categories similar to GET '/categories' endpoint
 - Request Arguments: None
@@ -149,7 +149,7 @@ Example response:
     "success": true
 }
 
-###DELETE '/users/<int>'
+### DELETE '/users/<int>'
 -Deletes a user by id from the database
 Request Arguments: id of user to be deleted
 Returns: Json object that contains {'succes': True, 'deleted': first + last name }
@@ -160,7 +160,7 @@ Example response:
     "success":true
 }
 
-###DELETE '/advisors/<int>'
+### DELETE '/advisors/<int>'
 -Deletes a user by id from the database
 Request Arguments: id of user to be deleted
 Returns: Json object that contains {'succes': True, 'deleted': first + last name }
@@ -171,7 +171,7 @@ Example response:
     "success":true
 }
 
-###POST '/users'
+### POST '/users'
 -Adds a user to the database
 Request Arguments: json object that contains the following values (first_name, last_name, field, level, subscription_active, advisor_name)
 Returns: Json object that contains {'succes': True, 'user': {}}
@@ -191,7 +191,7 @@ Example response:
 }
 
 
-###POST '/advisors'
+### POST '/advisors'
 -Adds an advisor to the database
 Request Arguments: json object that contains the following values (first_name, last_name, field, postion, experience, country)
 Returns: Json object that contains {'succes': True, 'advisor': {}}
@@ -210,7 +210,7 @@ Example response:
     "success":true
 }
 
-###PATCH '/users'
+### PATCH '/users'
 -Update a specific users subscription by id
 Request Arguments: json object contains the boolean value for subscription_active
 Returns: Json object that contains {'succes': True, 'user': {}}
